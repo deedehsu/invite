@@ -6,121 +6,123 @@
     <title>文哲的新居落成邀請函</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
-      body {
-        background-color: #000000;
-        margin: 0;
-        overflow: hidden;
+      body { background-color: #000; margin: 0; overflow: hidden; }
+
+      /* 邀請卡容器：負責控制縮放動畫 */
+      #ui-container {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 9999;
+        transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        transform-origin: bottom left;
       }
 
-      /* 邀請卡主體 */
-      #ui-overlay {
-        position: fixed;
-        top: 50%;
+      /* 縮小狀態：變成一個精緻的小方塊/按鈕 */
+      #ui-container.minimized {
+        width: 60px;
+        height: 60px;
+        background: rgba(10, 25, 30, 0.9);
+        border: 1px solid #00ced1;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 放大狀態：展開成完整的邀請卡 */
+      #ui-container.expanded {
+        bottom: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 9999;
+        transform: translate(-50%, 50%);
         width: 85%;
-        max-width: 380px;
+        max-width: 360px;
+      }
+
+      /* 邀請卡內容樣式 */
+      #ui-overlay {
         padding: 30px 20px;
-        background: rgba(10, 25, 30, 0.85); /* 深青色半透明底 */
+        background: rgba(10, 25, 30, 0.85);
         color: #e0f7fa;
         text-align: center;
         border-radius: 20px;
         border: 1px solid #00ced1;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
         font-family: "Microsoft JhengHei", sans-serif;
-        pointer-events: none;
-        overflow: hidden; /* 確保裝飾不超出卡片邊界 */
+        display: none; /* 預設隱藏內容 */
+        position: relative;
       }
 
-      /* 十字架浮雕效果：利用偽元素實現 */
-      #ui-overlay::after {
-        content: "";
+      #ui-container.expanded #ui-overlay { display: block; }
+      #ui-container.minimized::before { content: "✉"; font-size: 24px; color: #00ced1; }
+
+      /* 關閉按鈕 */
+      .close-btn {
         position: absolute;
-        bottom: 15px; 
-        right: 15px;  
-        width: 100px; 
-        height: 100px;
-        
-        /* 直接將十字架圖案寫在代碼裡，不依賴外部檔案 */
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        color: #88aaaa;
+        cursor: pointer;
+      }
+
+      h1 { color: #00ced1; font-size: 1.4rem; margin-top: 0; }
+      .info { font-size: 1rem; margin: 10px 0; }
+      .quote { font-size: 0.85rem; color: #88aaaa; font-style: italic; margin-top: 15px; line-height: 1.5; }
+
+      /* 十字架裝飾 */
+      .cross-deco {
+        position: absolute;
+        bottom: 10px;
+        right: 15px;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #00ced1 0%, #008b8b 100%);
         -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M45 10 h10 v30 h30 v10 h-30 v40 h-10 v-40 h-30 v-10 h30 z' fill='black'/></svg>");
         mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M45 10 h10 v30 h30 v10 h-30 v40 h-10 v-40 h-30 v-10 h30 z' fill='black'/></svg>");
-        
-        -webkit-mask-size: contain;
-        mask-size: contain;
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        -webkit-mask-position: center;
-        mask-position: center;
-
-        /* 背景顏色使用主題青色，並增加一點浮雕高光 */
-        background: linear-gradient(135deg, #00ced1 0%, #008b8b 100%);
-        box-shadow: inset 2px 2px 5px rgba(255,255,255,0.3);
-        
-        filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.8));
-        opacity: 0.7;
-        z-index: -1;
-      }
-
-      h1 { color: #00ced1; font-size: 1.5rem; margin-top: 0; letter-spacing: 2px; }
-      .info { font-size: 1.1rem; margin: 12px 0; letter-spacing: 1px; }
-      .quote { font-size: 0.9rem; color: #88aaaa; font-style: italic; margin: 20px 0 10px; line-height: 1.5; }
-      .hint { font-size: 0.8rem; color: #557777; margin-top: 15px; }
-      
-      a-scene {
-        display: block;
-        position: relative;
-        z-index: 1;
+        mask-size: contain; mask-repeat: no-repeat; opacity: 0.5; z-index: -1;
       }
     </style>
   </head>
   <body>
 
-    <div id="ui-overlay">
-      <h1>新居落成 誠摯邀請</h1>
-      <div style="border-top: 1px solid #00ced1; width: 40px; margin: 0 auto 20px;"></div>
-      
-      <p class="info"><strong>主邀人：文哲</strong></p>
-      <p class="info">115年5月16日 下午15:00</p>
-      <p class="info">高雄市鼓山區中華一路29巷</p>
-      
-      <p class="quote">〈 請帶著你們的祝福來，願你們的祝福，<br>成為我們的房角石 〉</p>
-      <p class="info" style="font-size: 0.95rem;">現場備有甜點、飲料</p>
-      
-      <p class="hint">〈 轉動手機可環視新居外牆 〉</p>
+    <div id="ui-container" class="minimized" onclick="toggleInvite(event)">
+      <div id="ui-overlay">
+        <span class="close-btn" onclick="toggleInvite(event)">×</span>
+        <h1>新居落成 誠摯邀請</h1>
+        <div style="border-top: 1px solid #00ced1; width: 40px; margin: 0 auto 15px;"></div>
+        <p class="info"><strong>主邀人：文哲</strong></p>
+        <p class="info">115年5月16日 下午15:00</p>
+        <p class="info" style="font-size: 0.9rem;">高雄市鼓山區中華一路29巷</p>
+        <p class="quote">〈 請帶著你們的祝福來，願你們的祝福，<br>成為我們的房角石 〉</p>
+        <div class="cross-deco"></div>
+      </div>
     </div>
 
     <a-scene vr-mode-ui="enabled: false">
-      <a-assets>
-        <img id="panorama" src="bg.jpg">
-      </a-assets>
-
-      <a-sky 
-        src="#panorama" 
-        rotation="0 -90 0" 
-        phi-length="360" 
-        theta-length="45" 
-        theta-start="68"
-        radius="15"
-        material="repeat: 2 1;">
-      </a-sky>
-
-      <a-entity id="rig">
-        <a-entity id="myCamera" 
-          camera="fov: 45;" 
-          look-controls="magicWindowTrackingEnabled: true; touchEnabled: true;">
-        </a-entity>
-      </a-entity>
+      <a-assets><img id="panorama" src="bg.jpg"></a-assets>
+      <a-sky src="#panorama" rotation="0 -90 0" phi-length="360" theta-length="45" theta-start="68" radius="15" material="repeat: 2 1;"></a-sky>
+      <a-entity id="rig"><a-entity id="myCamera" camera="fov: 45;" look-controls></a-entity></a-entity>
     </a-scene>
 
     <script>
-      // 鎖定垂直角度
+      function toggleInvite(e) {
+        e.stopPropagation();
+        const container = document.getElementById('ui-container');
+        if (container.classList.contains('minimized')) {
+          container.classList.remove('minimized');
+          container.classList.add('expanded');
+        } else if (e.target.classList.contains('close-btn')) {
+          container.classList.remove('expanded');
+          container.classList.add('minimized');
+        }
+      }
+
       AFRAME.registerComponent('lock-vertical', {
         tick: function () {
           var rotation = this.el.getAttribute('rotation');
-          if (rotation.x !== 0) {
-            this.el.setAttribute('rotation', {x: 0, y: rotation.y, z: 0});
-          }
+          if (rotation.x !== 0) this.el.setAttribute('rotation', {x: 0, y: rotation.y, z: 0});
         }
       });
       document.querySelector('#myCamera').setAttribute('lock-vertical', '');
